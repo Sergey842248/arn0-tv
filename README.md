@@ -1,4 +1,4 @@
-# Arn0 Launcher
+# Arn0 Launcher — Live TV / Hidden Apps fork
 
 A quieter home screen for a Samsung Tizen TV: a clock, a row of your apps, a row of your consoles,
 and nothing else.
@@ -6,6 +6,19 @@ and nothing else.
 ![The launcher on the "Milky Way" wallpaper, showing the clock, an apps row and a consoles row](docs/preview.png)
 
 *The browser preview, with the bundled Manrope font and the "Milky Way" wallpaper.*
+
+## Fork additions: Live TV and Hidden Apps
+
+This complete source archive includes the additions documented in [the fork notes](docs/FORK-CHANGES-LIVE-TV.md):
+
+- **Live TV** (`org.tizen.tv-viewer`) is a normal app tile in the Apps row. It has a dedicated TV/play logo, can be moved in **Settings → Apps on Home**, and can be removed or added again.
+- **Hidden apps** (`show: false`) can be selected in **Settings → Apps on Home → Add apps** and are marked `Hidden`. Some Samsung system services may still refuse to launch.
+- The fork keeps the upstream launcher application ID and does not modify the native Home/startup helper.
+
+### Install this fork on Arch Linux
+
+Follow [INSTALLATION-ARCH.md](INSTALLATION-ARCH.md). The archive already contains the complete source tree and original assets; no repository clone is part of installation. Build `dist/arn0-launcher.wgt`, then use [Apps2Samsung](https://github.com/Apps2Samsung/Apps2Samsung) to sign and install the local WGT. For upgrades, keep the same signing profile as the installed app.
+
 
 I built this for one TV in my living room, a Samsung Q70B on Tizen 6.5, because its own home
 screen had become a shop. It does what I want: the apps I use, the consoles I own, driven by the normal remote. I am sharing it as a starting point rather than a product.

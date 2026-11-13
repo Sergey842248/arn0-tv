@@ -357,13 +357,13 @@
         ed.items = Home.homeItems().slice();
         var onHome = {};
         ed.items.forEach(function (i) { onHome[i.id] = true; });
-        ed.others = Apps.allSorted(Home.apps(), false).filter(function (a) { return !onHome[a.id]; });
+        ed.others = Apps.allSorted(Home.apps(), true, true).filter(function (a) { return !onHome[a.id]; });
     }
 
     function edRow(item, moving) {
         var row = el('div', 'ed-item' + (moving ? ' moving' : ''));
         row.appendChild(Home.miniTile(item));
-        row.appendChild(el('span', 'ed-label', item.label));
+        row.appendChild(el('span', 'ed-label', item.label + (item.hidden ? ' · Hidden' : '')));
         if (moving) row.appendChild(el('span', 'ed-move', '↕'));
         return row;
     }
@@ -376,7 +376,7 @@
         other.innerHTML = '';
         ed.others.forEach(function (item) { other.appendChild(edRow(item, false)); });
         $('ed-home-title').textContent = 'On Home · ' + ed.items.length;
-        $('ed-other-title').textContent = 'Add apps · ' + ed.others.length;
+        $('ed-other-title').textContent = 'Add apps · incl. hidden · ' + ed.others.length;
         if (!ed.others.length) ed.col = 0;
     }
 

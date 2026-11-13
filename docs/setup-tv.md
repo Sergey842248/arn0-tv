@@ -25,6 +25,8 @@ other regions' firmware are all untested here.
 
 ## Part 1 — install the launcher
 
+For this fork, use [the Arch Linux installation guide](../INSTALLATION-ARCH.md) and [Apps2Samsung](https://github.com/Apps2Samsung/Apps2Samsung) to sign and install the local `.wgt` file.
+
 Prerequisites: Node.js 20+, and the TV in Developer Mode on the same network.
 
 1. Build the package:

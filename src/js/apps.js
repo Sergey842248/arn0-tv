@@ -6,6 +6,7 @@
     // Store apps have ids like "AbCdEfGhIj.Name"; a few consumer apps ship preinstalled with system ids.
     var STORE_ID = /^[A-Za-z0-9]{10}\.[A-Za-z0-9_-]+$/;
     var NUMERIC_ID = /^\d{9,13}$/;
+    var TV_VIEWER_APP = 'org.tizen.tv-viewer';
     var PRELOADED = [
         'org.tizen.netflix-app', 'org.tizen.primevideo', 'org.tizen.apple.apple-music',
         'org.tizen.browser', 'com.samsung.tv.aria-video'
@@ -76,6 +77,11 @@
             });
             // Prefer a visible consumer app when several match (e.g. Netflix and a Netflix service).
             var app = candidates.find(isConsumer) || candidates[0];
+            // Samsung's native TV viewer may not be returned by getAppsInfo().
+            // Keep it available as a curated launcher entry even when it is not listed.
+            if (!app && entry.id === TV_VIEWER_APP) {
+                app = { id: TV_VIEWER_APP, name: 'Live TV', show: true, iconPath: '' };
+            }
             if (app) {
                 used[app.id] = true;
                 out.push(toItem(app, entry));
@@ -84,11 +90,25 @@
         return out;
     }
 
-    function allSorted(apps, showEverything) {
-        return apps
-            .filter(function (a) { return showEverything ? a.show : isConsumer(a); })
-            .map(function (a) { return toItem(a, {}); })
-            .sort(function (x, y) { return x.label.localeCompare(y.label); });
+    function allSorted(apps, showEverything, includeHidden) {
+        var items = apps
+            .filter(function (a) {
+                return showEverything
+                    ? (includeHidden === true || a.show)
+                    : isConsumer(a);
+            })
+            .map(function (a) { return toItem(a, {}); });
+
+        // The Settings editor can add the native TV viewer even if Tizen does not
+        // expose it as an ordinary installed application.
+        if (includeHidden === true && !items.some(function (a) { return a.id === TV_VIEWER_APP; })) {
+            items.push(toItem(
+                { id: TV_VIEWER_APP, name: 'Live TV', show: true, iconPath: '' },
+                { label: 'Live TV', brand: 'livetv' }
+            ));
+        }
+
+        return items.sort(function (x, y) { return x.label.localeCompare(y.label); });
     }
 
     // Store names often carry a tagline: "Spotify - Music and Podcasts", "TF1+ : Streaming, …"
@@ -102,7 +122,8 @@
             id: app.id,
             label: entry.label || shortName(app.name),
             brand: entry.brand ? findBrand(entry.brand) : findBrand(app),
-            iconPath: app.iconPath || ''
+            iconPath: app.iconPath || '',
+            hidden: app.show === false
         };
     }
 
@@ -115,6 +136,7 @@
     }
 
     window.Apps = {
+        TV_VIEWER_APP: TV_VIEWER_APP,
         getInstalledApps: getInstalledApps,
         launchable: launchable,
         curated: curated,

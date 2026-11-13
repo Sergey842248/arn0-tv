@@ -147,7 +147,20 @@
 
     // Entries shown on Home: edited list from Settings, else config.js.
     function homeEntries() {
-        return Prefs.get().home || cfg.apps || [];
+        var prefs = Prefs.get();
+        var entries = prefs.home || cfg.apps || [];
+
+        // Add Live TV by default, but remember an explicit user removal.
+        if (!prefs.tvViewerRemoved && !entries.some(function (entry) {
+            return entry.id === Apps.TV_VIEWER_APP;
+        })) {
+            entries = entries.concat([{
+                id: Apps.TV_VIEWER_APP,
+                label: 'Live TV',
+                brand: 'livetv'
+            }]);
+        }
+        return entries;
     }
 
     function homeItems() {
@@ -155,10 +168,14 @@
     }
 
     function setHomeItems(items) {
-        Prefs.get().home = items.map(function (i) {
+        var prefs = Prefs.get();
+        prefs.home = items.map(function (i) {
             var entry = { id: i.id, label: i.label };
             if (i.brand) entry.brand = i.brand.key;
             return entry;
+        });
+        prefs.tvViewerRemoved = !items.some(function (i) {
+            return i.id === Apps.TV_VIEWER_APP;
         });
         Prefs.save();
         renderHome();
@@ -413,7 +430,12 @@
                 return [[$('gear')], UI.children($('apps-row')), UI.children($('inputs-row'))];
             },
             activate: function (item) {
-                if (item.kind === 'app') launchApp(item);
+                if (item.kind === 'app' && item.id === Apps.TV_VIEWER_APP) {
+                    runLogged('Open TV viewer', Inputs.openViewer()).catch(function (err) {
+                        UI.toast('Could not open Live TV: ' + DevLog.errorText(err));
+                    });
+                }
+                else if (item.kind === 'app') launchApp(item);
                 else if (item.kind === 'all') UI.show('all');
                 else if (item.kind === 'input') openInput(item);
                 else if (item.kind === 'settings') UI.show('settings');

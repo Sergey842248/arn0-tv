@@ -36,6 +36,7 @@
                 names: 'always'         // app names under tiles: 'always' | 'focused' | 'never'
             },
             home: null,                 // [{ id, label, brand }] once edited; null = config.js apps
+            tvViewerRemoved: false,     // user explicitly removed the Live TV tile
             inputs: null                // [{ hdmi, label, brand, method, hidden }] once edited; null = config.js
         };
     }
@@ -58,6 +59,7 @@
                 merge(prefs.appearance, saved.appearance);
                 if (Array.isArray(saved.home) && saved.home.length) prefs.home = saved.home;
                 if (Array.isArray(saved.inputs)) prefs.inputs = saved.inputs;
+                prefs.tvViewerRemoved = saved.tvViewerRemoved === true;
             } else {
                 var legacy = localStorage.getItem(LEGACY_WALLPAPER_KEY);
                 if (legacy) prefs.wallpaper.photo = legacy;
